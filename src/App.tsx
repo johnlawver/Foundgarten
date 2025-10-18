@@ -1,38 +1,45 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
+import { HomePage } from './components/layout/HomePage';
+import { getGame } from './lib/games/registry';
+import type { GameId } from './types/game';
+
+// Import all games to register them
+import './games';
 
 function App() {
-  return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      padding: '20px',
-      textAlign: 'center'
-    }}>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
-        Foundgarten
-      </h1>
-      <p style={{ fontSize: '1.25rem', color: '#666', marginBottom: '2rem' }}>
-        Foundational Kindergarten learning games
-      </p>
-      <div style={{
-        padding: '1.5rem',
-        backgroundColor: '#f0f0f0',
-        borderRadius: '12px',
-        maxWidth: '500px'
-      }}>
-        <p style={{ marginBottom: '1rem' }}>
-          Project initialized successfully!
-        </p>
-        <p style={{ fontSize: '0.9rem', color: '#666' }}>
-          Games coming soon...
-        </p>
-      </div>
-    </div>
-  );
+  const [currentView, setCurrentView] = useState<'home' | GameId>('home');
+
+  // Setup navigation handlers
+  useEffect(() => {
+    // Global navigation function
+    (window as any).navigateToGame = (gameId: GameId) => {
+      setCurrentView(gameId);
+    };
+
+    (window as any).navigateToHome = () => {
+      setCurrentView('home');
+    };
+
+    return () => {
+      delete (window as any).navigateToGame;
+      delete (window as any).navigateToHome;
+    };
+  }, []);
+
+  // Render home page
+  if (currentView === 'home') {
+    return <HomePage />;
+  }
+
+  // Render game
+  const game = getGame(currentView);
+  if (game) {
+    const GameComponent = game.Component;
+    return <GameComponent />;
+  }
+
+  // Fallback to home if game not found
+  return <HomePage />;
 }
 
 export default App;

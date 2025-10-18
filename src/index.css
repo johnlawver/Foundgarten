@@ -1,10 +1,66 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Custom Theme - Inspired by Modern Educational Apps */
+@theme {
+  /* Primary Yellow/Gold */
+  --color-yellow-50: #fffbeb;
+  --color-yellow-100: #fff3c4;
+  --color-yellow-200: #ffe999;
+  --color-yellow-300: #ffdd6b;
+  --color-yellow-400: #ffd13d;
+  --color-yellow-500: #ffc107;
+  --color-yellow-600: #f9a825;
+  --color-yellow-700: #f57f17;
+
+  /* Secondary Teal/Turquoise */
+  --color-teal-50: #e0f7f7;
+  --color-teal-100: #b2ebeb;
+  --color-teal-200: #80dddd;
+  --color-teal-300: #4ecfcf;
+  --color-teal-400: #26c5c5;
+  --color-teal-500: #00bbbb;
+  --color-teal-600: #00a5a5;
+  --color-teal-700: #008d8d;
+
+  /* Coral/Pink Accents */
+  --color-coral-50: #fff0f0;
+  --color-coral-100: #ffd9d9;
+  --color-coral-200: #ffb8b8;
+  --color-coral-300: #ff9696;
+  --color-coral-400: #ff7d7d;
+  --color-coral-500: #ff6464;
+  --color-coral-600: #ff5252;
+  --color-coral-700: #ff3838;
+
+  /* Neutrals */
+  --color-border: #1a1a1a;
+  --color-text-dark: #1a1a1a;
+  --color-bg-light: #f7f7f7;
+  --color-bg-white: #ffffff;
+
+  /* Semantic colors */
+  --color-success: #4ecfcf;
+  --color-error: #ff6464;
+  --color-warning: #ffc107;
+}
+
 /* Reset and base styles */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+html,
+body,
+h1, h2, h3, h4, h5, h6,
+p,
+ul, ol,
+figure,
+blockquote,
+dl, dd {
   margin: 0;
-  padding: 0;
 }
 
 html {
@@ -14,6 +70,7 @@ html {
 }
 
 body {
+  padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
