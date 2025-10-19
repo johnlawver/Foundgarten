@@ -55,47 +55,52 @@ export function RoundSummary({
       onBack={onHome}
     >
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Emoji and message */}
-        <div className="text-center mb-8">
-          <div className="text-8xl mb-4">{emoji}</div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+        {/* Emoji container with playful rotation */}
+        <div className="mb-8">
+          <div className="w-32 h-32 bg-yellow-300 rounded-3xl border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transform -rotate-6 mx-auto mb-6">
+            <span className="text-7xl">{emoji}</span>
+          </div>
+
+          <h2 className="text-4xl font-black text-black mb-2 text-center">
             {message}
           </h2>
-          <p className="text-gray-600">Round {roundNumber} Complete</p>
+          <div className="inline-block bg-teal-200 px-4 py-2 rounded-full border-[2px] border-black">
+            <p className="text-sm font-bold text-black">Round {roundNumber} Complete</p>
+          </div>
         </div>
 
         {/* Stats card */}
-        <Card className="w-full max-w-sm mb-8">
-          <div className="space-y-4">
+        <Card className="w-full max-w-sm mb-8 p-6" id="letter-match-stats-card">
+          <div className="space-y-6">
             {/* Success rate - big and prominent */}
-            <div className="text-center pb-4 border-b border-gray-200">
-              <div className="text-6xl font-bold text-blue-600 mb-1">
+            <div className="text-center pb-6 border-b-[3px] border-black" id="letter-match-success-rate">
+              <div className="text-7xl font-black text-yellow-400 mb-2">
                 {successRate}%
               </div>
-              <div className="text-sm text-gray-600">Success Rate</div>
+              <div className="text-sm font-bold text-black">Success Rate</div>
             </div>
 
             {/* Detailed stats */}
             <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-gray-800">
+              <div className="bg-yellow-50 rounded-2xl border-[2px] border-black p-3" id="letter-match-total-stat">
+                <div className="text-3xl font-black text-black mb-1">
                   {totalAttempts}
                 </div>
-                <div className="text-xs text-gray-600">Total</div>
+                <div className="text-xs font-semibold text-black">Total</div>
               </div>
 
-              <div>
-                <div className="text-2xl font-bold text-green-600">
+              <div className="bg-teal-200 rounded-2xl border-[2px] border-black p-3" id="letter-match-correct-stat">
+                <div className="text-3xl font-black text-black mb-1">
                   {correctCount}
                 </div>
-                <div className="text-xs text-gray-600">Correct</div>
+                <div className="text-xs font-semibold text-black">Correct</div>
               </div>
 
-              <div>
-                <div className="text-2xl font-bold text-red-600">
+              <div className="bg-coral-200 rounded-2xl border-[2px] border-black p-3" id="letter-match-incorrect-stat">
+                <div className="text-3xl font-black text-black mb-1">
                   {incorrectCount}
                 </div>
-                <div className="text-xs text-gray-600">Incorrect</div>
+                <div className="text-xs font-semibold text-black">Incorrect</div>
               </div>
             </div>
           </div>
@@ -107,22 +112,25 @@ export function RoundSummary({
             variant="primary"
             onClick={onPlayAgain}
             className="w-full"
+            id="letter-match-play-again-button"
           >
-            Play Again
+            🎮 Play Again
           </Button>
 
           <Button
-            variant="secondary"
+            variant="ghost"
             onClick={onSettings}
             className="w-full"
+            id="letter-match-summary-settings-button"
           >
             ⚙️ Settings
           </Button>
 
           <Button
-            variant="secondary"
+            variant="ghost"
             onClick={onHome}
             className="w-full"
+            id="letter-match-home-button"
           >
             🏠 Home
           </Button>

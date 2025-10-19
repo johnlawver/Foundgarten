@@ -3,21 +3,6 @@
  */
 
 /**
- * Database statistics for individual letters
- * Stored in Dexie letterMatchStatistics table
- */
-export interface LetterMatchStatistics {
-  id?: number; // Auto-increment primary key
-  letter: string; // 'A', 'B', 'C', etc.
-  caseType: 'uppercase' | 'lowercase';
-  totalAttempts: number;
-  correctCount: number;
-  incorrectCount: number;
-  lastAttempt: Date;
-  successRate: number; // correctCount / totalAttempts
-}
-
-/**
  * Letter object used during gameplay
  */
 export interface Letter {

@@ -25,14 +25,15 @@ export const GameContainer: React.FC<GameContainerProps> = ({
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f7f7]">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 bg-white border-b-[3px] border-black">
+      <header className="flex items-center justify-between p-4 bg-white border-b-[3px] border-black" id="game-container-header">
         {/* Left: Back button */}
         <div className="w-14">
           {onBack && (
             <button
               onClick={onBack}
-              className="w-12 h-12 rounded-2xl bg-coral-400 border-[3px] border-black flex items-center justify-center hover:bg-coral-500 active:bg-coral-600 transition-colors touch-manipulation shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+              className="w-12 h-12 rounded-2xl !bg-[#ffb8b8] border-[3px] border-black flex items-center justify-center hover:!bg-[#ff9696] active:!bg-[#ff7d7d] transition-colors touch-manipulation shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
               aria-label="Go back"
+              id="game-container-back-button"
             >
               <svg
                 className="w-6 h-6"
@@ -63,6 +64,7 @@ export const GameContainer: React.FC<GameContainerProps> = ({
               onClick={onSettings}
               className="w-12 h-12 rounded-2xl bg-yellow-400 border-[3px] border-black flex items-center justify-center hover:bg-yellow-500 active:bg-yellow-600 transition-colors touch-manipulation shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
               aria-label="Settings"
+              id="game-container-settings-button"
             >
               <svg
                 className="w-6 h-6"

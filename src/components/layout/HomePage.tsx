@@ -77,43 +77,11 @@ export const HomePage: React.FC = () => {
           </div>
         </header>
 
-        {/* Status Card */}
-        <div className="bg-white rounded-[32px] p-6 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-teal-400 rounded-2xl flex items-center justify-center border-[3px] border-black shrink-0 transform rotate-3">
-              <span className="text-4xl">✨</span>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-3xl font-black text-black mb-6">
-                Phase 1 Complete!
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: '💾', text: dbInitialized ? 'Database Ready' : 'Loading...' },
-                  { icon: '🧠', text: 'AI Learning Ready' },
-                  { icon: '🎨', text: 'Components Built' },
-                  { icon: '⚙️', text: 'State Configured' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-semibold text-black">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Games Section */}
         <section>
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-black text-black">
-              Learning Games
-            </h2>
-            <span className="px-4 py-2 bg-coral-400 text-black text-sm font-bold rounded-full border-[3px] border-black">
-              Coming Soon
-            </span>
-          </div>
+          <h2 className="text-3xl font-black text-black mb-8">
+            Learning Games
+          </h2>
 
           {games.length === 0 ? (
             <div className="bg-white rounded-[32px] p-12 text-center border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
@@ -154,52 +122,15 @@ export const HomePage: React.FC = () => {
                       <h3 className="text-xl font-black text-black mb-2 group-hover:text-teal-600 transition-colors">
                         {game.name}
                       </h3>
-                      <p className="text-sm text-gray-700 mb-4 font-medium">
+                      <p className="text-sm text-gray-700 font-medium">
                         {game.description}
                       </p>
-                      <div className="flex gap-2">
-                        <span className="px-3 py-1 bg-yellow-200 text-black text-xs font-bold rounded-full border-[2px] border-black">
-                          {game.itemType}
-                        </span>
-                        <span className="px-3 py-1 bg-teal-200 text-black text-xs font-bold rounded-full border-[2px] border-black">
-                          {game.defaultDifficulty}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </section>
-
-        {/* Next Steps */}
-        <section>
-          <div className="bg-white rounded-[32px] p-8 border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-14 h-14 bg-coral-400 rounded-2xl flex items-center justify-center border-[3px] border-black">
-                <span className="text-3xl">🚀</span>
-              </div>
-              <h3 className="text-3xl font-black text-black">What's Next</h3>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-5">
-              {[
-                { emoji: '🎨', title: 'Letter Match', desc: 'Swipe to learn letters' },
-                { emoji: '🔄', title: 'Orientation', desc: 'Find the right way' },
-                { emoji: '🧭', title: 'Navigation', desc: 'Move between pages' },
-                { emoji: '📱', title: 'App Icons', desc: 'Make it pretty' },
-              ].map((step, idx) => (
-                <div key={idx} className="flex items-start gap-4 p-4 bg-yellow-50 rounded-2xl border-[2px] border-black">
-                  <span className="text-4xl shrink-0">{step.emoji}</span>
-                  <div>
-                    <div className="font-black text-black text-lg mb-1">{step.title}</div>
-                    <div className="text-sm text-gray-700 font-medium">{step.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         {/* Debug Info */}

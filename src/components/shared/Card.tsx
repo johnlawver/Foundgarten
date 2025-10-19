@@ -11,6 +11,7 @@ export interface CardProps {
   className?: string;
   elevated?: boolean;
   interactive?: boolean;
+  id?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -19,6 +20,7 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   elevated = false,
   interactive = false,
+  id,
 }) => {
   const baseStyles = `
     bg-white rounded-3xl border-[3px] border-black
@@ -33,6 +35,7 @@ export const Card: React.FC<CardProps> = ({
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
+      id={id}
     >
       {children}
     </div>

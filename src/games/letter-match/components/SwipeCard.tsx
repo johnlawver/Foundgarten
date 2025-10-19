@@ -57,10 +57,9 @@ export function SwipeCard({ letter, onSwipe, disabled = false }: SwipeCardProps)
       // Trigger exit animation
       setIsExiting(true);
 
-      // Complete swipe after animation
-      setTimeout(() => {
-        onSwipe(direction);
-      }, 250);
+      // Complete swipe immediately (don't wait for animation)
+      // The parent will update and this component will unmount/remount
+      onSwipe(direction);
     } else {
       // Snap back to center
       setDragOffset({ x: 0, y: 0 });
@@ -113,11 +112,23 @@ export function SwipeCard({ letter, onSwipe, disabled = false }: SwipeCardProps)
   const showRightFeedback = dragOffset.x > 20;
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-full h-full flex flex-col items-center justify-center gap-8" id="letter-match-card-container">
+      {/* Swipe instruction header */}
+      <div className="text-center" id="letter-match-swipe-instruction">
+        <p className="text-lg font-bold text-gray-700">
+          ⬅️ Swipe to answer ➡️
+        </p>
+      </div>
+
+      {/* Card area wrapper */}
+      <div className="relative flex items-center justify-center flex-1 w-full">
       {/* Card */}
       <div
         ref={cardRef}
-        className="relative w-[280px] h-[380px] bg-white rounded-3xl shadow-2xl cursor-grab active:cursor-grabbing select-none touch-none"
+        className="relative w-[280px] h-[380px] bg-white rounded-[32px] border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-grab active:cursor-grabbing select-none touch-none"
+        id="letter-match-swipe-card"
+        data-letter={letter.character}
+        data-case={letter.caseType}
         style={{
           transform,
           transition: isDragging || isExiting
@@ -135,45 +146,54 @@ export function SwipeCard({ letter, onSwipe, disabled = false }: SwipeCardProps)
       >
         {/* Left feedback overlay (incorrect) */}
         <div
-          className="absolute inset-0 bg-red-500 rounded-3xl flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 bg-coral-400 rounded-[32px] flex items-center justify-center pointer-events-none"
+          id="letter-match-incorrect-feedback"
           style={{
-            opacity: showLeftFeedback ? feedbackOpacity * 0.3 : 0,
+            opacity: showLeftFeedback ? feedbackOpacity * 0.4 : 0,
             transition: 'opacity 0.1s',
           }}
         >
-          <div className="text-white text-8xl font-bold">✗</div>
+          <div className="text-black text-9xl font-black">✗</div>
         </div>
 
         {/* Right feedback overlay (correct) */}
         <div
-          className="absolute inset-0 bg-green-500 rounded-3xl flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 bg-teal-400 rounded-[32px] flex items-center justify-center pointer-events-none"
+          id="letter-match-correct-feedback"
           style={{
-            opacity: showRightFeedback ? feedbackOpacity * 0.3 : 0,
+            opacity: showRightFeedback ? feedbackOpacity * 0.4 : 0,
             transition: 'opacity 0.1s',
           }}
         >
-          <div className="text-white text-8xl font-bold">✓</div>
+          <div className="text-black text-9xl font-black">✓</div>
         </div>
 
         {/* Letter display */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-[180px] font-bold text-gray-800 leading-none">
+          <div className="text-[180px] font-black text-black leading-none">
             {letter.character}
           </div>
         </div>
       </div>
 
-      {/* Swipe hint indicators */}
-      {!isDragging && !isExiting && (
-        <>
-          <div className="absolute left-8 top-1/2 -translate-y-1/2 text-red-400 text-4xl opacity-30">
-            ⬅
-          </div>
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 text-green-400 text-4xl opacity-30">
-            ➡
-          </div>
-        </>
-      )}
+        {/* Swipe hint indicators - elliptical backgrounds from viewport edges */}
+        {!isDragging && !isExiting && (
+          <>
+            {/* Left swipe hint - half ellipse from left edge of viewport */}
+            <div
+              className="fixed left-0 top-1/2 -translate-y-1/2 w-24 h-96 !bg-[#ffb8b8] opacity-30 pointer-events-none"
+              style={{ borderRadius: '0 100% 100% 0 / 0 50% 50% 0' }}
+              id="letter-match-swipe-left-hint"
+            />
+            {/* Right swipe hint - half ellipse from right edge of viewport */}
+            <div
+              className="fixed right-0 top-1/2 -translate-y-1/2 w-24 h-96 !bg-[#80dddd] opacity-30 pointer-events-none"
+              style={{ borderRadius: '100% 0 0 100% / 50% 0 0 50%' }}
+              id="letter-match-swipe-right-hint"
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

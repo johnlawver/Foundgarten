@@ -37,6 +37,13 @@ export class FoundgartenDatabase extends Dexie {
       orientationGameStatistics: '++id, gameId, character, characterType, caseType, lastAttempt',
       appSettings: '++id, &key',
     });
+
+    // Version 2: Add compound indexes
+    this.version(2).stores({
+      letterMatchStatistics: '++id, gameId, letter, caseType, [letter+caseType], lastAttempt',
+      orientationGameStatistics: '++id, gameId, character, characterType, caseType, [character+characterType+caseType], lastAttempt',
+      appSettings: '++id, &key',
+    });
   }
 
   /**
@@ -70,7 +77,7 @@ export class FoundgartenDatabase extends Dexie {
   /**
    * Initialize Letter Match statistics for all letters
    */
-  private async initializeLetterMatchStats(): Promise<void> {
+  async initializeLetterMatchStats(): Promise<void> {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const initialStats: Omit<LetterMatchStatistics, 'id'>[] = [];
 
@@ -108,7 +115,7 @@ export class FoundgartenDatabase extends Dexie {
   /**
    * Initialize Orientation Game statistics for common characters
    */
-  private async initializeOrientationGameStats(): Promise<void> {
+  async initializeOrientationGameStats(): Promise<void> {
     const letters = {
       uppercase: 'ABCDEFGHJKLMNPQRSTUVWXYZ',
       lowercase: 'abcdefghjklmnpqrstuvwxyz',

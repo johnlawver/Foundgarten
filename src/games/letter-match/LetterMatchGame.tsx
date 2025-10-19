@@ -39,16 +39,18 @@ export function LetterMatchGame() {
     setIsStarted(true);
   };
 
-  const handleSwipe = async (direction: SwipeDirection) => {
+  const handleSwipe = (direction: SwipeDirection) => {
     if (direction === null) return;
 
     const correct = direction === 'right';
-    await recordAnswer(correct);
 
-    // Haptic feedback if supported
-    if ('vibrate' in navigator && correct) {
-      navigator.vibrate(50);
-    }
+    // Record answer asynchronously (don't block UI)
+    recordAnswer(correct).then(() => {
+      // Haptic feedback if supported
+      if ('vibrate' in navigator && correct) {
+        navigator.vibrate(50);
+      }
+    });
   };
 
   const handlePlayAgain = async () => {
@@ -74,35 +76,64 @@ export function LetterMatchGame() {
         onBack={handleBack}
       >
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+          {/* Icon with playful rotation */}
           <div className="mb-8">
-            <div className="text-6xl mb-4">🔤</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            <div className="w-28 h-28 bg-yellow-300 rounded-3xl border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center transform rotate-6 mx-auto mb-6">
+              <span className="text-6xl">🔤</span>
+            </div>
+
+            <h2 className="text-4xl font-black text-black mb-6">
               Letter Match
             </h2>
-            <p className="text-gray-600 mb-2">
-              Show your child the letter
-            </p>
-            <p className="text-gray-600 mb-2">
-              Ask: "What letter is this?"
-            </p>
-            <p className="text-gray-600">
-              Swipe ➡️ if correct, ⬅️ if incorrect
-            </p>
+
+            {/* Instructions card */}
+            <div className="bg-white rounded-[32px] border-[3px] border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 max-w-md mx-auto mb-8">
+              <div className="space-y-3 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-teal-200 rounded-xl border-[2px] border-black flex items-center justify-center shrink-0">
+                    <span className="text-xl">1</span>
+                  </div>
+                  <p className="text-base font-semibold text-black">
+                    Show your child the letter
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-yellow-200 rounded-xl border-[2px] border-black flex items-center justify-center shrink-0">
+                    <span className="text-xl">2</span>
+                  </div>
+                  <p className="text-base font-semibold text-black">
+                    Ask: "What letter is this?"
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-coral-200 rounded-xl border-[2px] border-black flex items-center justify-center shrink-0">
+                    <span className="text-xl">3</span>
+                  </div>
+                  <p className="text-base font-semibold text-black">
+                    Swipe ➡️ correct, ⬅️ incorrect
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 w-full max-w-xs">
             <Button
               variant="primary"
               onClick={handleStart}
-              className="w-48"
+              className="w-full !bg-teal-200 hover:!bg-teal-300 active:!bg-teal-400"
+              id="letter-match-start-button"
             >
-              Start Round
+              🎮 Start Round
             </Button>
 
             <Button
-              variant="secondary"
+              variant="ghost"
               onClick={() => setShowSettings(true)}
-              className="w-48"
+              className="w-full"
+              id="letter-match-welcome-settings-button"
             >
               ⚙️ Settings
             </Button>
@@ -119,15 +150,22 @@ export function LetterMatchGame() {
   // Round summary screen
   if (roundComplete) {
     return (
-      <RoundSummary
-        totalAttempts={totalLetters}
-        correctCount={currentScore}
-        incorrectCount={totalLetters - currentScore}
-        roundNumber={currentRound}
-        onPlayAgain={handlePlayAgain}
-        onHome={handleBack}
-        onSettings={() => setShowSettings(true)}
-      />
+      <>
+        <RoundSummary
+          totalAttempts={totalLetters}
+          correctCount={currentScore}
+          incorrectCount={totalLetters - currentScore}
+          roundNumber={currentRound}
+          onPlayAgain={handlePlayAgain}
+          onHome={handleBack}
+          onSettings={() => setShowSettings(true)}
+        />
+
+        {/* Settings panel overlay */}
+        {showSettings && (
+          <SettingsPanel onClose={() => setShowSettings(false)} />
+        )}
+      </>
     );
   }
 
@@ -138,17 +176,23 @@ export function LetterMatchGame() {
       onBack={handleBack}
     >
       {/* Header - Score and Settings */}
-      <div className="flex items-center justify-between px-6 py-4">
+      <div className="w-full flex items-center justify-between px-6 py-4">
         <button
           onClick={() => setShowSettings(true)}
-          className="text-2xl hover:opacity-70 transition-opacity"
+          className="w-14 h-14 bg-yellow-300 rounded-2xl border-[3px] border-black flex items-center justify-center hover:bg-yellow-400 active:bg-yellow-500 transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
           aria-label="Settings"
+          id="letter-match-settings-button"
         >
-          ⚙️
+          <span className="text-2xl">⚙️</span>
         </button>
 
-        <div className="text-lg font-semibold text-gray-700">
-          Score: {currentScore} / {currentIndex}
+        <div
+          className="bg-white px-5 py-2 rounded-full border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+          id="letter-match-score-display"
+        >
+          <span className="text-lg font-black text-black">
+            {currentScore} / {currentIndex}
+          </span>
         </div>
       </div>
 
@@ -156,6 +200,7 @@ export function LetterMatchGame() {
       <div className="flex-1 flex items-center justify-center px-6">
         {currentLetter && (
           <SwipeCard
+            key={`${currentLetter.character}-${currentIndex}`}
             letter={currentLetter}
             onSwipe={handleSwipe}
           />
@@ -163,9 +208,14 @@ export function LetterMatchGame() {
       </div>
 
       {/* Progress footer */}
-      <div className="px-6 py-4 text-center">
-        <div className="text-sm text-gray-500">
-          Round {currentRound} • {progress}
+      <div className="px-6 py-4 flex justify-center">
+        <div
+          className="bg-teal-200 px-6 py-2 rounded-full border-[2px] border-black"
+          id="letter-match-progress-display"
+        >
+          <span className="text-sm font-bold text-black">
+            Round {currentRound} • {progress}
+          </span>
         </div>
       </div>
 

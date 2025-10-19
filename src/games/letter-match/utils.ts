@@ -4,13 +4,9 @@
  */
 
 import { db } from '@/lib/storage/db';
-import { weightedRandomSelection, normalizeWeights } from '@/lib/learning/weighted-selection';
-import type { WeightedItem } from '@/types/game';
-import type {
-  Letter,
-  LetterMatchStatistics,
-  LetterMatchConfig,
-} from '@/types/letter-match';
+import { weightedRandomSelection } from '@/lib/learning/weighted-selection';
+import type { LetterMatchStatistics, LetterMatchConfig, WeightedItem } from '@/types/game';
+import type { Letter } from '@/types/letter-match';
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
@@ -84,11 +80,22 @@ export async function generateAdaptiveRound(
     }
   }
 
+  // Convert to WeightedItem format for selection
+  const weightedItems: WeightedItem[] = weightedLetters.map((item, idx) => ({
+    itemId: `${item.character}-${item.caseType}-${idx}`,
+    weight: item.weight,
+  }));
+
   // Use weighted selection to pick letters
-  const selectedLetters = weightedSelection(
-    weightedLetters,
-    config.roundSize
-  );
+  const selectedIds = weightedRandomSelection(weightedItems, config.roundSize, false);
+
+  // Map back to Letter objects
+  const selectedLetters = selectedIds.map(id => {
+    const parts = id.split('-');
+    const char = parts[0];
+    const caseType = parts[1] as 'uppercase' | 'lowercase';
+    return weightedLetters.find(l => l.character === char && l.caseType === caseType)!;
+  }).filter(Boolean).map(({ character, caseType }) => ({ character, caseType }));
 
   return shuffleArray(selectedLetters);
 }
@@ -139,17 +146,21 @@ export async function recordAnswer(
   letter: Letter,
   correct: boolean
 ): Promise<void> {
+  const upperLetter = letter.character.toUpperCase();
+
   // Find existing stat
   let stat = await db.letterMatchStatistics
     .where('[letter+caseType]')
-    .equals([letter.character.toUpperCase(), letter.caseType])
+    .equals([upperLetter, letter.caseType])
     .first();
 
   if (!stat) {
     // Create new stat entry
     stat = {
-      letter: letter.character.toUpperCase(),
-      caseType: letter.caseType,
+      gameId: 'letter-match',
+      itemId: `${upperLetter}-${letter.caseType}`,
+      letter: upperLetter,
+      caseType: letter.caseType as any, // Type assertion for 'both' | 'n/a' compatibility
       totalAttempts: 0,
       correctCount: 0,
       incorrectCount: 0,
@@ -188,8 +199,10 @@ export async function initializeLetterStatistics(): Promise<void> {
   for (const letter of ALPHABET) {
     for (const caseType of ['uppercase', 'lowercase'] as const) {
       stats.push({
+        gameId: 'letter-match',
+        itemId: `${letter}-${caseType}`,
         letter,
-        caseType,
+        caseType: caseType as any, // Type assertion for CaseType compatibility
         totalAttempts: 0,
         correctCount: 0,
         incorrectCount: 0,

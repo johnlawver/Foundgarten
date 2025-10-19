@@ -25,27 +25,28 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" id="letter-match-settings-overlay">
+      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto p-6" id="letter-match-settings-panel">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Letter Match Settings
+        <div className="flex items-center justify-between mb-6 pb-4 border-b-[3px] border-black">
+          <h2 className="text-2xl font-black text-black">
+            ⚙️ Settings
           </h2>
           <button
             onClick={onClose}
-            className="text-2xl text-gray-500 hover:text-gray-700"
+            className="w-10 h-10 rounded-xl bg-coral-400 border-[3px] border-black flex items-center justify-center hover:bg-coral-500 active:bg-coral-600 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             aria-label="Close"
+            id="letter-match-settings-close-button"
           >
-            ✕
+            <span className="text-xl font-black">✕</span>
           </button>
         </div>
 
         {/* Settings content */}
         <div className="space-y-6">
           {/* Difficulty */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div id="letter-match-difficulty-setting">
+            <label className="block text-sm font-bold text-black mb-3">
               Difficulty
             </label>
             <div className="flex gap-2">
@@ -53,26 +54,26 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={difficulty}
                   onClick={() => updateConfig({ difficulty })}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+                  className={`flex-1 py-2 px-4 rounded-full font-bold transition-all border-[2px] border-black ${
                     config.difficulty === difficulty
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-yellow-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                      : 'bg-white text-black hover:bg-yellow-100'
                   }`}
                 >
                   {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-600 mt-1">
-              {config.difficulty === 'easy' && 'Even distribution of all letters'}
-              {config.difficulty === 'auto' && 'Adaptive - focuses on struggling letters'}
-              {config.difficulty === 'hard' && 'Heavily focuses on incorrect letters'}
+            <p className="text-xs font-semibold text-black mt-2 bg-yellow-50 p-2 rounded-xl border-[2px] border-black">
+              {config.difficulty === 'easy' && '📊 Even distribution of all letters'}
+              {config.difficulty === 'auto' && '🎯 Adaptive - focuses on struggling letters'}
+              {config.difficulty === 'hard' && '🔥 Heavily focuses on incorrect letters'}
             </p>
           </div>
 
           {/* Letter Case */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <div id="letter-match-case-setting">
+            <label className="block text-sm font-bold text-black mb-3">
               Letter Case
             </label>
             <div className="flex gap-2">
@@ -80,10 +81,10 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <button
                   key={letterCase}
                   onClick={() => updateConfig({ letterCase })}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+                  className={`flex-1 py-2 px-4 rounded-full font-bold transition-all border-[2px] border-black ${
                     config.letterCase === letterCase
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-teal-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                      : 'bg-white text-black hover:bg-teal-100'
                   }`}
                 >
                   {letterCase === 'both'
@@ -97,9 +98,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           </div>
 
           {/* Round Size */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Round Size: {config.roundSize} letters
+          <div id="letter-match-round-size-setting">
+            <label className="block text-sm font-bold text-black mb-3">
+              Round Size: <span className="bg-coral-200 px-3 py-1 rounded-full border-[2px] border-black">{config.roundSize}</span> letters
             </label>
             <input
               type="range"
@@ -109,29 +110,33 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               onChange={(e) =>
                 updateConfig({ roundSize: parseInt(e.target.value) })
               }
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-3 bg-yellow-100 rounded-lg appearance-none cursor-pointer border-[2px] border-black"
+              id="letter-match-round-size-slider"
+              style={{
+                accentColor: '#facc15',
+              }}
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-1">
-              <span>10</span>
-              <span>26</span>
+            <div className="flex justify-between text-xs font-bold text-black mt-2">
+              <span>10 min</span>
+              <span>26 max</span>
             </div>
           </div>
 
           {/* Sound Effects */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">
-              Sound Effects
+            <label className="text-sm font-bold text-black">
+              🔊 Sound Effects
             </label>
             <button
               onClick={() =>
                 updateConfig({ soundEnabled: !config.soundEnabled })
               }
-              className={`relative w-14 h-8 rounded-full transition-colors ${
-                config.soundEnabled ? 'bg-blue-600' : 'bg-gray-300'
+              className={`relative w-14 h-8 rounded-full transition-colors border-[3px] border-black ${
+                config.soundEnabled ? 'bg-teal-400' : 'bg-gray-200'
               }`}
             >
               <div
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform border-[2px] border-black ${
                   config.soundEnabled ? 'translate-x-6' : ''
                 }`}
               />
@@ -140,19 +145,19 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
           {/* Haptic Feedback */}
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-700">
-              Haptic Feedback
+            <label className="text-sm font-bold text-black">
+              📳 Haptic Feedback
             </label>
             <button
               onClick={() =>
                 updateConfig({ hapticEnabled: !config.hapticEnabled })
               }
-              className={`relative w-14 h-8 rounded-full transition-colors ${
-                config.hapticEnabled ? 'bg-blue-600' : 'bg-gray-300'
+              className={`relative w-14 h-8 rounded-full transition-colors border-[3px] border-black ${
+                config.hapticEnabled ? 'bg-teal-400' : 'bg-gray-200'
               }`}
             >
               <div
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition-transform ${
+                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform border-[2px] border-black ${
                   config.hapticEnabled ? 'translate-x-6' : ''
                 }`}
               />
@@ -160,35 +165,38 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           </div>
 
           {/* Reset Progress */}
-          <div className="pt-4 border-t border-gray-200">
+          <div className="pt-4 border-t-[3px] border-black">
             {!showResetConfirm ? (
               <Button
-                variant="secondary"
+                variant="ghost"
                 onClick={() => setShowResetConfirm(true)}
-                className="w-full text-red-600 hover:bg-red-50"
+                className="w-full !border-coral-400 !text-coral-600 hover:!bg-coral-50"
+                id="letter-match-reset-progress-button"
               >
-                Reset Progress
+                🗑️ Reset Progress
               </Button>
             ) : (
-              <div className="space-y-2">
-                <p className="text-sm text-gray-700 text-center">
-                  Are you sure? This will erase all statistics.
-                </p>
+              <div className="space-y-3">
+                <div className="bg-coral-100 p-4 rounded-2xl border-[2px] border-black">
+                  <p className="text-sm font-bold text-black text-center">
+                    ⚠️ Are you sure? This will erase all statistics!
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   <Button
-                    variant="secondary"
+                    variant="ghost"
                     onClick={() => setShowResetConfirm(false)}
                     className="flex-1"
                   >
                     Cancel
                   </Button>
-                  <Button
-                    variant="primary"
+                  <button
                     onClick={handleResetProgress}
-                    className="flex-1 bg-red-600 hover:bg-red-700"
+                    className="flex-1 px-6 py-3 bg-coral-400 text-black font-bold rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all min-h-[56px]"
+                    id="letter-match-confirm-reset-button"
                   >
                     Confirm Reset
-                  </Button>
+                  </button>
                 </div>
               </div>
             )}
@@ -196,9 +204,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
         </div>
 
         {/* Close button */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <Button variant="primary" onClick={onClose} className="w-full">
-            Done
+        <div className="mt-6 pt-4 border-t-[3px] border-black">
+          <Button variant="primary" onClick={onClose} className="w-full" id="letter-match-settings-done-button">
+            ✓ Done
           </Button>
         </div>
       </Card>
