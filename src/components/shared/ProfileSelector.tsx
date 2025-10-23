@@ -138,13 +138,13 @@ export function ProfileSelector() {
       {/* Delete Confirmation Modal */}
       {profileToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="w-full max-w-sm bg-white rounded-[24px] border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-coral-200 rounded-2xl border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">⚠️</span>
+          <div className="w-full max-w-sm bg-white rounded-[24px] border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 sm:p-6">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-coral-200 rounded-2xl border-[3px] border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <span className="text-3xl sm:text-4xl">⚠️</span>
               </div>
-              <h3 className="text-xl font-black text-black mb-2">Delete Profile?</h3>
-              <p className="text-sm font-bold text-black">
+              <h3 className="text-lg sm:text-xl font-black text-black mb-2">Delete Profile?</h3>
+              <p className="text-xs sm:text-sm font-bold text-black">
                 This will permanently delete{' '}
                 <span className="inline-flex items-center gap-1">
                   <span>{profiles.find(p => p.id === profileToDelete)?.emoji}</span>
@@ -153,17 +153,17 @@ export function ProfileSelector() {
                 's profile and all their learning data.
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setProfileToDelete(null)}
-                className="flex-1 px-4 py-3 bg-white text-black font-bold rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                className="flex-1 px-4 py-3 bg-white text-black font-bold rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all min-h-[48px]"
                 id="cancel-delete-profile"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="flex-1 px-4 py-3 bg-coral-400 text-black font-bold rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                className="flex-1 px-4 py-3 bg-coral-400 text-black font-bold rounded-full border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] transition-all min-h-[48px]"
                 id="confirm-delete-profile"
               >
                 Delete
