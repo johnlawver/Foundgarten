@@ -6,19 +6,27 @@
 import { useState } from 'react';
 import { useLetterMatchStore } from '../store';
 import { resetAllStatistics } from '../utils';
+import { useProfileStore } from '@/lib/profiles/store';
 import { Button } from '@/components/shared/Button';
 import { Card } from '@/components/shared/Card';
 
 interface SettingsPanelProps {
   onClose: () => void;
+  onViewProgress?: () => void;
 }
 
-export function SettingsPanel({ onClose }: SettingsPanelProps) {
+export function SettingsPanel({ onClose, onViewProgress }: SettingsPanelProps) {
   const { config, updateConfig, resetGame } = useLetterMatchStore();
+  const { activeProfileId, getActiveProfile } = useProfileStore();
+  const activeProfile = getActiveProfile();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const handleResetProgress = async () => {
-    await resetAllStatistics();
+    if (!activeProfileId) {
+      console.error('No active profile');
+      return;
+    }
+    await resetAllStatistics(activeProfileId);
     resetGame();
     setShowResetConfirm(false);
     onClose();
@@ -164,6 +172,23 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             </button>
           </div>
 
+          {/* View Progress */}
+          {onViewProgress && (
+            <div className="pt-4 border-t-[3px] border-black">
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  onClose();
+                  onViewProgress();
+                }}
+                className="w-full !bg-teal-200 hover:!bg-teal-300 !shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                id="letter-match-settings-view-progress-button"
+              >
+                📊 View Letter Progress
+              </Button>
+            </div>
+          )}
+
           {/* Reset Progress */}
           <div className="pt-4 border-t-[3px] border-black">
             {!showResetConfirm ? (
@@ -179,7 +204,13 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               <div className="space-y-3">
                 <div className="bg-coral-100 p-4 rounded-2xl border-[2px] border-black">
                   <p className="text-sm font-bold text-black text-center">
-                    ⚠️ Are you sure? This will erase all statistics!
+                    ⚠️ Are you sure? This will erase all statistics for{' '}
+                    {activeProfile && (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{activeProfile.emoji}</span>
+                        <span className="font-black">{activeProfile.name}</span>
+                      </span>
+                    )}!
                   </p>
                 </div>
                 <div className="flex gap-2">

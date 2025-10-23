@@ -508,6 +508,33 @@ Output in `dist/` directory.
 npm run preview
 ```
 
+### Netlify Deployment (Configured)
+
+The project includes `netlify.toml` configuration for automatic deployment:
+
+**Automatic Deployment**:
+```bash
+# Deploys automatically when pushing to main branch
+git push origin main
+```
+
+**Manual Deployment**:
+```bash
+# Using Netlify CLI
+npm run build
+netlify deploy --prod --dir=dist
+
+# Or drag-and-drop dist/ folder to Netlify dashboard
+```
+
+**Configuration** (`netlify.toml`):
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Node version: 20
+- SPA redirects: `/*` → `/index.html`
+- PWA headers for service worker
+- Cache control for static assets (1 year)
+
 ### Deployment Checklist
 
 - [ ] Run `npm run build` successfully
@@ -519,15 +546,27 @@ npm run preview
 - [ ] Test on real mobile device
 - [ ] Validate manifest.json
 - [ ] Ensure service worker caches all assets
+- [ ] Verify HTTPS is enabled (required for PWA)
+- [ ] Test on multiple browsers (Chrome, Safari, Firefox)
 
 ### Deployment Platforms
 
-The built app can be deployed to:
-- **Netlify**: Drag-and-drop `dist/` folder
-- **Vercel**: Connect GitHub repo
+**Primary (Configured)**:
+- **Netlify** ✅ - Automatic deployment via `netlify.toml`
+  - Push to main branch auto-deploys
+  - SPA redirects configured
+  - PWA headers configured
+
+**Alternative Platforms**:
+- **Vercel**: Connect GitHub repo, auto-deploy on push
 - **GitHub Pages**: Use `gh-pages` branch
 - **Firebase Hosting**: `firebase deploy`
 - **Any static host**: Upload `dist/` contents
+
+**Requirements for All Platforms**:
+- SPA redirects (`/*` → `/index.html`)
+- HTTPS enabled (required for service workers)
+- Custom headers (optional, for caching optimization)
 
 ## Troubleshooting
 
@@ -595,5 +634,6 @@ await db.open();
 
 ---
 
-**Last Updated**: 2025-01-17
+**Last Updated**: 2025-10-22
+**Version**: 0.1.0
 **Maintainer**: Project Team

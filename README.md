@@ -4,31 +4,64 @@
 
 A mobile-first, offline-capable Progressive Web App (PWA) designed to help kindergarten-aged children learn through interactive games.
 
+## Current Status
+
+**Version**: 0.1.0 (Initial Implementation)
+**Status**: 🎮 Letter Match game is fully playable!
+
+**What's Working**:
+- ✅ Letter Match game with swipe-based gameplay
+- ✅ **Multi-child profiles** with separate progress tracking
+- ✅ **Letter Progress view** showing success rates for all letters
+- ✅ Adaptive learning algorithm
+- ✅ Offline data persistence (IndexedDB)
+- ✅ Neo-brutalist design system
+- ✅ Mobile-optimized touch interactions
+- ✅ Netlify deployment configured
+
+**In Development**:
+- 🚧 Orientation Game (Mirror Match)
+- 🚧 PWA service worker verification
+
 ## Overview
 
 Foundgarten provides adaptive learning experiences that adjust based on each child's performance. All games work completely offline, persist data locally on the device, and are optimized for touch interactions on mobile phones.
 
 ## Features
 
+- **Multi-Child Profiles**: Create separate profiles for each child with independent progress tracking
 - **Offline-First**: Works completely without internet connectivity
 - **Mobile-Optimized**: Designed for mobile phones with touch-friendly interfaces
 - **Adaptive Learning**: Games adjust difficulty based on performance
 - **Progressive Web App**: Installable on home screen, works like a native app
-- **Privacy-Focused**: All data stored locally, no external tracking
+- **Privacy-Focused**: All data stored locally on device, never transferred anywhere
 - **Parent Controls**: Simple settings to adjust difficulty and preferences
 
 ## Games
 
-### Letter Match
+### Letter Match ✅ (Implemented)
 A swipe-based letter recognition game where children identify uppercase and lowercase letters. Parents show their child a letter and swipe right for correct answers or left for incorrect ones.
+
+**Status**: Fully playable with adaptive learning
+**Features**:
+- Swipe gestures (touch and mouse support)
+- Visual feedback overlays
+- Round statistics and progress tracking
+- **Letter Progress view** with color-coded success rates
+- **Uppercase/lowercase toggle** to view separate or combined statistics
+- **Profile-scoped progress** - each child's data tracked separately
+- Configurable difficulty settings
+- IndexedDB persistence for learning progress
 
 **Learning Objectives**:
 - Uppercase and lowercase letter recognition
 - Letter matching skills
 - Visual discrimination
 
-### Orientation Game (Mirror Match)
+### Orientation Game (Mirror Match) 🚧 (Planned)
 A tap-based game where children identify correctly oriented letters and numbers versus horizontally flipped (mirrored) ones. Helps prevent common letter reversals like b/d and p/q.
+
+**Status**: Database schema ready, game implementation pending
 
 **Learning Objectives**:
 - Spatial awareness and orientation
@@ -156,14 +189,49 @@ The built files will be in the `dist/` directory, ready for deployment to any st
 
 ## Deployment
 
-The app can be deployed to any static hosting service:
+### Netlify (Configured)
 
-- **Netlify** - Drag-and-drop deployment
+The project includes `netlify.toml` configuration for automatic deployment:
+
+```bash
+# Build and deploy automatically on push to main branch
+git push origin main
+```
+
+**Features**:
+- Automatic builds on git push
+- SPA redirects for client-side routing
+- PWA-optimized headers
+- Asset caching (1 year for static files)
+- Service worker support (no-cache for updates)
+
+**Manual Deployment**:
+```bash
+# Build locally
+npm run build
+
+# Deploy to Netlify (via CLI or drag-and-drop)
+netlify deploy --prod --dir=dist
+```
+
+### Alternative Hosting
+
+The app can be deployed to any static hosting service that supports:
+- SPA redirects (`/*` → `/index.html`)
+- HTTPS (required for PWA service workers)
+- Custom headers (optional, for caching optimization)
+
+**Recommended Services**:
+- **Netlify** ✅ (configured and recommended)
 - **Vercel** - Git-based deployment
 - **GitHub Pages** - Free static hosting
 - **Firebase Hosting** - Google's hosting solution
 
-All that's needed is to upload the contents of the `dist/` folder.
+**Deployment Steps**:
+1. Run `npm run build` to create production build
+2. Upload the contents of the `dist/` folder to your hosting service
+3. Configure SPA redirects (if needed)
+4. Ensure HTTPS is enabled
 
 ## PWA Installation
 
@@ -231,18 +299,33 @@ Test coverage focuses on:
 
 ## Roadmap
 
-### Planned Features
+### Phase 1: MVP ✅ (Current)
+- ✅ Letter Match game
+- ✅ Adaptive learning algorithm
+- ✅ IndexedDB persistence
+- ✅ Neo-brutalist design system
+- ✅ Mobile-first responsive UI
+- ✅ Deployment configuration
+
+### Phase 2: Next Steps 🚧
+- 🚧 Orientation Game (Mirror Match)
+- 🚧 PWA service worker verification
+- 🚧 Sound effects and haptic feedback
+- 🚧 Parent statistics dashboard
+
+### Phase 3: Future Features
 - Additional learning games (counting, colors, shapes)
 - Multi-device sync (optional cloud backup)
-- Audio instructions and feedback
-- Detailed parent dashboard
+- Audio instructions and pronunciation
+- Detailed progress tracking and charts
 - Progress export/sharing
 - Multi-language support
+- Custom letter/number sets
 
 ### Current Status
-- **Phase**: Planning & Initial Development
-- **Version**: Pre-release
-- **Games Planned**: Letter Match, Orientation Game
+- **Phase**: Phase 1 Complete, Phase 2 In Progress
+- **Version**: 0.1.0 (Initial Implementation)
+- **Games**: Letter Match (playable), Orientation Game (planned)
 
 ## License
 

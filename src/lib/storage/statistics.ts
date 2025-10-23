@@ -16,19 +16,22 @@ import type {
 export async function recordLetterMatchAnswer(
   letter: string,
   caseType: 'uppercase' | 'lowercase',
-  correct: boolean
+  correct: boolean,
+  profileId: number
 ): Promise<void> {
   const itemId = `${letter}-${caseType}`;
 
   // Get existing statistics or create new
   let stat = await db.letterMatchStatistics
-    .where({ letter, caseType })
+    .where('[profileId+letter+caseType]')
+    .equals([profileId, letter, caseType])
     .first();
 
   if (!stat) {
     // Create new statistics entry
     stat = {
       gameId: 'letter-match',
+      profileId,
       itemId,
       letter,
       caseType,
@@ -61,19 +64,22 @@ export async function recordOrientationGameAnswer(
   character: string,
   characterType: 'letter' | 'number',
   caseType: 'uppercase' | 'lowercase' | 'n/a',
-  correct: boolean
+  correct: boolean,
+  profileId: number
 ): Promise<void> {
   const itemId = `${character}-${caseType === 'n/a' ? 'number' : caseType}`;
 
   // Get existing statistics or create new
   let stat = await db.orientationGameStatistics
-    .where({ character, caseType })
+    .where('[profileId+character+characterType+caseType]')
+    .equals([profileId, character, characterType, caseType])
     .first();
 
   if (!stat) {
     // Create new statistics entry
     stat = {
       gameId: 'orientation-game',
+      profileId,
       itemId,
       character,
       characterType,
@@ -198,15 +204,19 @@ export async function getItemsNeedingPractice(
 }
 
 /**
- * Reset statistics for a specific game
+ * Reset statistics for a specific game and profile
  */
-export async function resetGameStatistics(gameId: GameId): Promise<void> {
+export async function resetGameStatistics(gameId: GameId, profileId: number): Promise<void> {
   if (gameId === 'letter-match') {
-    await db.letterMatchStatistics.clear();
-    await db.initializeLetterMatchStats();
+    await db.letterMatchStatistics
+      .where('profileId')
+      .equals(profileId)
+      .delete();
   } else if (gameId === 'orientation-game') {
-    await db.orientationGameStatistics.clear();
-    await db.initializeOrientationGameStats();
+    await db.orientationGameStatistics
+      .where('profileId')
+      .equals(profileId)
+      .delete();
   }
 }
 

@@ -8,6 +8,7 @@ import { useLetterMatchStore } from './store';
 import { SwipeCard } from './components/SwipeCard';
 import { RoundSummary } from './components/RoundSummary';
 import { SettingsPanel } from './components/SettingsPanel';
+import { LetterProgress } from './components/LetterProgress';
 import { GameContainer } from '@/components/shared/GameContainer';
 import { Button } from '@/components/shared/Button';
 import type { SwipeDirection } from '@/types/letter-match';
@@ -24,6 +25,7 @@ export function LetterMatchGame() {
   } = useLetterMatchStore();
 
   const [showSettings, setShowSettings] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
 
   // Auto-start first round if not started
@@ -130,6 +132,15 @@ export function LetterMatchGame() {
             </Button>
 
             <Button
+              variant="secondary"
+              onClick={() => setShowProgress(true)}
+              className="w-full !bg-yellow-200 hover:!bg-yellow-300 !shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              id="letter-match-welcome-progress-button"
+            >
+              📊 View Progress
+            </Button>
+
+            <Button
               variant="ghost"
               onClick={() => setShowSettings(true)}
               className="w-full"
@@ -141,10 +152,21 @@ export function LetterMatchGame() {
         </div>
 
         {showSettings && (
-          <SettingsPanel onClose={() => setShowSettings(false)} />
+          <SettingsPanel
+            onClose={() => setShowSettings(false)}
+            onViewProgress={() => setShowProgress(true)}
+          />
+        )}
+        {showProgress && (
+          <LetterProgress onClose={() => setShowProgress(false)} />
         )}
       </GameContainer>
     );
+  }
+
+  // Letter progress view
+  if (showProgress) {
+    return <LetterProgress onClose={() => setShowProgress(false)} />;
   }
 
   // Round summary screen
@@ -159,11 +181,15 @@ export function LetterMatchGame() {
           onPlayAgain={handlePlayAgain}
           onHome={handleBack}
           onSettings={() => setShowSettings(true)}
+          onViewProgress={() => setShowProgress(true)}
         />
 
         {/* Settings panel overlay */}
         {showSettings && (
-          <SettingsPanel onClose={() => setShowSettings(false)} />
+          <SettingsPanel
+            onClose={() => setShowSettings(false)}
+            onViewProgress={() => setShowProgress(true)}
+          />
         )}
       </>
     );
@@ -221,7 +247,10 @@ export function LetterMatchGame() {
 
       {/* Settings panel overlay */}
       {showSettings && (
-        <SettingsPanel onClose={() => setShowSettings(false)} />
+        <SettingsPanel
+          onClose={() => setShowSettings(false)}
+          onViewProgress={() => setShowProgress(true)}
+        />
       )}
     </GameContainer>
   );

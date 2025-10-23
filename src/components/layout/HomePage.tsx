@@ -7,10 +7,16 @@ import { useEffect, useState } from 'react';
 import { getAllGameConfigs } from '@/lib/games/registry';
 import type { GameConfig } from '@/types/game';
 import { db } from '@/lib/storage/db';
+import { useProfileStore } from '@/lib/profiles/store';
+import { ProfileSelector } from '@/components/shared/ProfileSelector';
+import { ProfileCreateModal } from '@/components/shared/ProfileCreateModal';
 
 export const HomePage: React.FC = () => {
   const [games, setGames] = useState<GameConfig[]>([]);
   const [dbInitialized, setDbInitialized] = useState(false);
+  const [showFirstRunModal, setShowFirstRunModal] = useState(false);
+
+  const { hasProfiles, isLoading } = useProfileStore();
 
   useEffect(() => {
     // Get registered games
@@ -22,6 +28,13 @@ export const HomePage: React.FC = () => {
       setDbInitialized(size.letterMatchStats > 0 || size.orientationGameStats > 0);
     });
   }, []);
+
+  // Show first-run modal if no profiles exist
+  useEffect(() => {
+    if (!isLoading && !hasProfiles()) {
+      setShowFirstRunModal(true);
+    }
+  }, [isLoading, hasProfiles]);
 
   const handleGameClick = (gameId: string) => {
     // Use global navigation function
@@ -61,19 +74,24 @@ export const HomePage: React.FC = () => {
       {/* Main Content */}
       <main className="relative max-w-5xl mx-auto p-6 space-y-10">
         {/* Header */}
-        <header className="text-center pt-8 pb-4">
-          <div className="inline-flex items-center gap-6 mb-6">
-            <div className="w-20 h-20 bg-yellow-400 rounded-3xl flex items-center justify-center border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform -rotate-6">
-              <span className="text-4xl">🎓</span>
-            </div>
-            <div className="text-left">
-              <h1 className="text-5xl font-black text-black mb-1">
-                Foundgarten
-              </h1>
-              <div className="inline-block bg-yellow-300 px-3 py-1 rounded-full border-[2px] border-black">
-                <p className="text-sm font-bold text-black">Learn & Play!</p>
+        <header className="pt-8 pb-4">
+          <div className="flex items-center justify-between mb-6">
+            <div className="inline-flex items-center gap-6">
+              <div className="w-20 h-20 bg-yellow-400 rounded-3xl flex items-center justify-center border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform -rotate-6">
+                <span className="text-4xl">🎓</span>
+              </div>
+              <div className="text-left">
+                <h1 className="text-5xl font-black text-black mb-1">
+                  Foundgarten
+                </h1>
+                <div className="inline-block bg-yellow-300 px-3 py-1 rounded-full border-[2px] border-black">
+                  <p className="text-sm font-bold text-black">Learn & Play!</p>
+                </div>
               </div>
             </div>
+
+            {/* Profile Selector */}
+            {!isLoading && hasProfiles() && <ProfileSelector />}
           </div>
         </header>
 
@@ -163,6 +181,13 @@ export const HomePage: React.FC = () => {
           </section>
         )}
       </main>
+
+      {/* First-Run Profile Creation Modal */}
+      <ProfileCreateModal
+        isOpen={showFirstRunModal}
+        onClose={() => setShowFirstRunModal(false)}
+        isFirstRun={true}
+      />
     </div>
   );
 };

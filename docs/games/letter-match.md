@@ -1,5 +1,24 @@
 # Letter Match Game
 
+## Implementation Status
+
+**Status**: ✅ Fully Implemented
+**Last Updated**: 2025-10-22
+**Version**: 1.0
+
+The Letter Match game is fully functional with all core features implemented, including:
+- Welcome screen with instructions
+- Swipe-based gameplay with touch and mouse support
+- Adaptive learning algorithm with weighted selection
+- Round summary with statistics
+- **Multi-child profiles** with separate progress tracking per child
+- **Letter Progress view** showing aggregated success rates for all letters
+- **Uppercase/lowercase toggle** to view separate or combined statistics
+- Settings panel for difficulty and preferences
+- IndexedDB persistence for profile-scoped statistics
+- Neo-brutalist UI design with component IDs for debugging
+- Netlify deployment configuration
+
 ## Game Overview
 
 **Name**: Letter Match
@@ -46,7 +65,18 @@ A Tinder-style swipe interface where children match lowercase letters with their
    - Total correct / total attempted
    - Success rate percentage
    - "Play Again" button
+   - **"View Letter Progress" button** - Shows aggregated success rates for all letters
+   - "Settings" button
    - "Home" button
+
+2. **Letter Progress View** (accessed from round summary):
+   - Shows success rates for all 26 letters
+   - Color-coded cards: 🟢 Great (80%+), 🟡 Good (60-79%), 🔴 Practice (<60%), ⚪ Not tried
+   - Toggle between two views:
+     - **"Aa Separate"**: Shows uppercase and lowercase as distinct pairs (26 rows × 2 columns)
+     - **"A Combined"**: Shows all letters in grid with aggregated stats (4-6 columns)
+   - Summary statistics showing mastered/learning/practice counts
+   - "Done" button to return to round summary
 
 ### Adaptive Behavior
 - First round: Show all 26 letters once in random order
@@ -112,6 +142,7 @@ A Tinder-style swipe interface where children match lowercase letters with their
 // Dexie table: letterMatchStatistics
 interface LetterMatchStatistics {
   id?: number;              // Auto-increment
+  profileId: number;        // Child profile this statistic belongs to
   letter: string;           // 'A', 'B', 'C', etc.
   caseType: 'uppercase' | 'lowercase';
   totalAttempts: number;
@@ -120,6 +151,8 @@ interface LetterMatchStatistics {
   lastAttempt: Date;
   successRate: number;      // correctCount / totalAttempts
 }
+
+// Compound index: [profileId+letter+caseType] for efficient profile-scoped queries
 ```
 
 ### Game State (Zustand Store)
@@ -152,9 +185,12 @@ interface Letter {
 ### Round Generation Algorithm
 
 ```typescript
-async function generateRound(roundNumber: number): Promise<Letter[]> {
-  // 1. Fetch statistics for all letters
-  const stats = await db.letterMatchStatistics.toArray();
+async function generateRound(roundNumber: number, profileId: number): Promise<Letter[]> {
+  // 1. Fetch statistics for active profile only
+  const stats = await db.letterMatchStatistics
+    .where('profileId')
+    .equals(profileId)
+    .toArray();
 
   // 2. Calculate weights for each letter
   const weights = stats.map(stat => ({
@@ -193,14 +229,16 @@ function calculateWeight(stat: LetterMatchStatistics): number {
 ### Answer Recording
 
 ```typescript
-async function recordAnswer(letter: string, correct: boolean): Promise<void> {
-  // 1. Get or create statistics record
+async function recordAnswer(letter: string, correct: boolean, profileId: number): Promise<void> {
+  // 1. Get or create statistics record for active profile
   let stat = await db.letterMatchStatistics
-    .where({ letter, caseType: currentLetter.caseType })
+    .where('[profileId+letter+caseType]')
+    .equals([profileId, letter, currentLetter.caseType])
     .first();
 
   if (!stat) {
     stat = {
+      profileId,
       letter,
       caseType: currentLetter.caseType,
       totalAttempts: 0,
@@ -365,9 +403,86 @@ interface LetterMatchConfig {
 - **Custom Letter Sets**: Focus on specific letters (e.g., vowels only)
 - **Multi-Child Profiles**: Track progress for multiple children
 
+## Implementation Notes
+
+### Actual Implementation Details
+
+**Components Implemented**:
+- `LetterMatchGame.tsx` - Main game component with three screens (welcome, gameplay, summary, progress)
+- `SwipeCard.tsx` - Swipeable card with drag gestures, visual feedback, and animations
+- `RoundSummary.tsx` - Post-round statistics and navigation
+- `LetterProgress.tsx` - **NEW**: Aggregated letter progress view with separate/combined toggle
+- `SettingsPanel.tsx` - Configuration panel overlay
+- `store.ts` - Zustand store for game state
+- `utils.ts` - Round generation and statistics algorithms (profile-scoped)
+
+**Key Features**:
+1. **Swipe Gestures**: Full support for both mouse and touch events with:
+   - Drag threshold of 100px
+   - Rotation effect during drag
+   - Exit animations
+   - Visual feedback overlays (correct/incorrect)
+
+2. **Adaptive Algorithm**: Implemented in `utils.ts`:
+   - First round shows all 26 letters
+   - Subsequent rounds use weighted random selection
+   - Error weight calculation: `1 - successRate`
+   - Letters with lower success rates appear more frequently
+
+3. **UI Design**: Neo-brutalist style with:
+   - 3px black borders on all cards
+   - Hard drop shadows (6px-8px offset)
+   - Yellow, teal, and coral color palette
+   - Elliptical swipe hint backgrounds from viewport edges
+   - Component IDs for debugging (e.g., `letter-match-swipe-card`)
+
+4. **Database**: IndexedDB via Dexie with:
+   - `letterMatchStatistics` table with compound index `[profileId+letter+caseType]`
+   - `profiles` table for child profiles (name, emoji, createdAt)
+   - **Profile-scoped statistics** - each child has separate progress tracking
+   - Auto-initialization for all 52 letters per profile (26 uppercase + 26 lowercase)
+   - Aggregate statistics (not session-based)
+
+5. **Deployment**: Netlify configuration in `netlify.toml`:
+   - SPA redirects for client-side routing
+   - PWA-friendly headers for service worker
+   - Cache control for static assets
+
+### Known Limitations
+
+**Not Yet Implemented**:
+- ❌ Sound effects (planned but not added)
+- ❌ Audio pronunciation of letters
+- ❌ Custom letter sets
+
+**Future Enhancements** (see Future Enhancements section above)
+
 ## Change Log
 
-### Version 1.0 (Initial Requirements)
+### Version 1.1 - Multi-Child Profiles (2025-10-22)
+- ✅ Added multi-child profile system with global profile selector
+- ✅ Created LetterProgress component showing aggregated success rates
+- ✅ Implemented uppercase/lowercase toggle (Aa Separate vs A Combined views)
+- ✅ Updated database schema (v3, v4) with profileId in all statistics
+- ✅ Added first-run profile creation modal
+- ✅ Profile-scoped statistics with compound indexes
+- ✅ Privacy notice for device-local storage
+- ✅ Neo-brutalist design for profile modals and selectors
+
+### Version 1.0 - Implemented (2025-10-18)
+- ✅ Implemented full swipe-based gameplay with mouse and touch support
+- ✅ Built adaptive learning algorithm with weighted selection
+- ✅ Created welcome screen with instructions
+- ✅ Implemented round summary with statistics
+- ✅ Added settings panel for configuration
+- ✅ Set up IndexedDB persistence with Dexie
+- ✅ Applied neo-brutalist design system throughout
+- ✅ Added component IDs for debugging
+- ✅ Configured Netlify deployment
+- ✅ Added elliptical swipe hint backgrounds
+- ✅ Cleaned up UI (removed Phase 1 badges)
+
+### Version 0.1 (Initial Requirements)
 - Defined core swipe-based gameplay
 - Established adaptive learning algorithm
 - Designed parent-driven interaction model
@@ -375,6 +490,6 @@ interface LetterMatchConfig {
 
 ---
 
-**Last Updated**: 2025-01-17
-**Status**: Planning Phase
+**Last Updated**: 2025-10-22
+**Status**: Implemented & Deployed
 **Author**: Project Team

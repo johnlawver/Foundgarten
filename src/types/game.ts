@@ -30,6 +30,7 @@ export interface GameConfig {
 export interface GameStatistics {
   id?: number;
   gameId: GameId;
+  profileId: number;  // Child profile this statistic belongs to
   itemId: string;
   totalAttempts: number;
   correctCount: number;

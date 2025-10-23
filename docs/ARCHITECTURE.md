@@ -1,5 +1,27 @@
 # Architecture Documentation
 
+## Implementation Status
+
+**Status**: 🚧 Initial Implementation Complete
+**Version**: 0.1.0
+**Last Updated**: 2025-10-22
+
+**Implemented**:
+- ✅ Letter Match game (fully functional)
+- ✅ **Multi-child profiles** with separate progress tracking
+- ✅ Letter Progress view with uppercase/lowercase toggle
+- ✅ IndexedDB persistence with Dexie (v4 schema)
+- ✅ Zustand state management
+- ✅ Adaptive learning algorithm
+- ✅ Neo-brutalist design system
+- ✅ Shared component library (Button, Card, GameContainer, ScoreDisplay, ProfileSelector, ProfileCreateModal)
+- ✅ Netlify deployment configuration
+- ✅ TanStack Router setup
+
+**In Progress**:
+- 🚧 PWA service worker (configured, needs verification)
+- 🚧 Orientation Game (database schema ready, game not built)
+
 ## Project Overview
 
 **Foundgarten** is a mobile-first, offline-capable Progressive Web App (PWA) designed to help kindergarten-aged children learn through interactive games. The app works completely offline, persists data locally on a single device, and provides adaptive learning experiences that adjust based on the child's performance.
@@ -59,75 +81,89 @@
 - Precache all app assets
 - Runtime caching for dynamic resources
 
-### UI Components
+### UI Components & Styling
 - **Shared Component Library**: Consistent design system
-- Tailwind CSS (or similar) for utility-first styling
-- Touch-optimized interactive elements
-- Accessibility-first component design
+- **Tailwind CSS v4**: Utility-first styling
+- **Neo-Brutalist Design**: 3px borders, hard shadows, yellow/teal/coral palette
+- Touch-optimized interactive elements (44px+ touch targets)
+- Component IDs for debugging and testing
 
 ## Application Structure
+
+### Actual File Structure (As Implemented)
 
 ```
 foundgarten/
 ├── docs/                          # Project documentation
 │   ├── ARCHITECTURE.md           # This file
 │   ├── DEVELOPMENT.md            # Setup and dev guide
-│   ├── TESTING.md                # Testing strategy
 │   └── games/                    # Individual game requirements
-│       ├── letter-match.md
-│       └── orientation-game.md
+│       ├── letter-match.md       # ✅ Implemented
+│       └── orientation-game.md   # 🚧 Planned
+├── inspo/                         # Design inspiration images
 ├── public/                        # Static assets
 │   ├── icons/                    # PWA icons
-│   ├── images/                   # Game images
-│   └── manifest.json             # PWA manifest
+│   └── manifest.webmanifest      # PWA manifest
 ├── src/
 │   ├── components/
-│   │   ├── shared/               # Reusable UI components
+│   │   ├── shared/               # ✅ Reusable UI components
 │   │   │   ├── Button.tsx
 │   │   │   ├── Card.tsx
 │   │   │   ├── ScoreDisplay.tsx
-│   │   │   └── GameContainer.tsx
-│   │   └── layout/               # App layout components
-│   │       ├── Header.tsx
-│   │       ├── Navigation.tsx
-│   │       └── AppShell.tsx
+│   │   │   ├── GameContainer.tsx
+│   │   │   ├── ProfileSelector.tsx       # ✅ Profile dropdown
+│   │   │   ├── ProfileCreateModal.tsx    # ✅ Create profile UI
+│   │   │   └── index.ts
+│   │   └── layout/               # ✅ App layout components
+│   │       └── HomePage.tsx
 │   ├── games/                    # Game modules
-│   │   ├── letter-match/         # Example: Letter matching game
-│   │   │   ├── components/       # Game-specific UI
-│   │   │   ├── store/           # Game state (Zustand)
-│   │   │   ├── utils/           # Game logic & algorithms
-│   │   │   ├── types.ts         # Game type definitions
-│   │   │   └── index.tsx        # Game entry point
-│   │   └── orientation-game/
-│   │       └── ...
+│   │   ├── index.ts              # Game registry
+│   │   └── letter-match/         # ✅ IMPLEMENTED
+│   │       ├── components/       # Game-specific UI
+│   │       │   ├── SwipeCard.tsx
+│   │       │   ├── RoundSummary.tsx
+│   │       │   ├── LetterProgress.tsx    # ✅ Letter stats view
+│   │       │   └── SettingsPanel.tsx
+│   │       ├── store.ts          # Zustand store
+│   │       ├── utils.ts          # Game logic & algorithms
+│   │       ├── index.ts          # Game entry point
+│   │       └── LetterMatchGame.tsx
 │   ├── lib/
-│   │   ├── storage/              # Database utilities
-│   │   │   ├── db.ts            # Dexie setup
-│   │   │   ├── migrations.ts    # Schema migrations
-│   │   │   └── types.ts         # DB type definitions
-│   │   ├── router/              # Router configuration
-│   │   │   └── index.tsx
-│   │   └── learning/            # Adaptive learning algorithms
-│   │       └── weighted-selection.ts
-│   ├── hooks/                    # Shared React hooks
-│   │   ├── useGameState.ts
-│   │   ├── useStatistics.ts
-│   │   └── useOfflineStatus.ts
-│   ├── utils/                    # Shared utilities
-│   │   ├── constants.ts
-│   │   └── helpers.ts
-│   ├── types/                    # Shared TypeScript types
-│   │   ├── game.ts
-│   │   └── statistics.ts
+│   │   ├── storage/              # ✅ Database utilities
+│   │   │   └── db.ts            # Dexie setup with schemas (v4)
+│   │   ├── profiles/             # ✅ Profile management
+│   │   │   └── store.ts         # Profile Zustand store
+│   │   └── router/              # ✅ Router configuration
+│   │       └── index.tsx
+│   ├── hooks/                    # 🚧 Planned (not yet needed)
+│   ├── utils/                    # 🚧 Shared utilities (minimal so far)
+│   ├── types/                    # ✅ TypeScript types
+│   │   ├── game.ts              # Game type definitions
+│   │   └── letter-match.ts      # Letter Match types
+│   ├── routes/                   # ✅ TanStack Router routes
+│   │   ├── __root.tsx
+│   │   ├── index.tsx
+│   │   └── games/
+│   │       └── letter-match.tsx
 │   ├── App.tsx                   # Root component
 │   ├── main.tsx                  # Entry point
-│   └── sw.ts                     # Service worker
+│   └── index.css                 # Global styles
+├── netlify.toml                  # ✅ Netlify deployment config
+├── CLAUDE.md                     # ✅ AI context for assistants
 ├── RULES.md                      # AI assistance guidelines
+├── QUICK_START.md                # Quick reference
 ├── README.md                     # Project overview
 ├── package.json
 ├── tsconfig.json
 └── vite.config.ts
 ```
+
+**Key Differences from Plan**:
+- Games are directly in `src/games/letter-match/` (no `/store` or `/utils` subdirectories)
+- TanStack Router uses `routes/` directory for route definitions
+- No separate `learning/` directory yet (algorithms in game `utils.ts`)
+- Hooks directory not yet needed (may add later)
+- CLAUDE.md added for AI assistant context
 
 ## Core Concepts
 
@@ -181,13 +217,30 @@ class GameRegistry {
 
 ### Data Models
 
+#### Child Profiles
+
+Multi-child support with separate progress tracking:
+
+```typescript
+interface Profile {
+  id?: number;             // Auto-increment
+  name: string;            // Child's name
+  emoji: string;           // Avatar emoji
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+All game statistics are scoped to a profile via `profileId`.
+
 #### Game Statistics
 
-Aggregate statistics stored per game:
+Aggregate statistics stored per game and profile:
 
 ```typescript
 interface GameStatistics {
   gameId: string;
+  profileId: number;       // Child profile this statistic belongs to
   itemId: string;          // Letter, number, etc.
   totalAttempts: number;
   correctCount: number;
@@ -196,6 +249,8 @@ interface GameStatistics {
   successRate: number;     // Calculated: correctCount / totalAttempts
 }
 ```
+
+**Profile-scoped queries** use compound indexes like `[profileId+letter+caseType]` for efficient filtering.
 
 #### Game Session
 
@@ -419,9 +474,78 @@ export const ExampleGame: React.FC = () => {
 - i18n for multiple languages
 - Cloud backup option (opt-in)
 
+## Deployment
+
+### Netlify Configuration
+
+The app is configured for deployment to Netlify via `netlify.toml`:
+
+**Build Settings**:
+- Build command: `npm run build`
+- Publish directory: `dist/`
+- Node version: 20
+
+**Features**:
+- SPA redirects for client-side routing (`/* -> /index.html`)
+- PWA-friendly headers for service worker
+- Cache control for static assets (31536000s = 1 year)
+- No-cache policy for service worker updates
+
+**Deployment**:
+```bash
+# Build for production
+npm run build
+
+# Deploy to Netlify (auto-deploys on git push to main)
+git push origin main
+```
+
+### Alternative Hosting
+
+The app can be deployed to any static hosting service that supports:
+- SPA redirects
+- HTTPS (required for service workers)
+- Custom headers (optional, for PWA optimization)
+
+**Recommended Hosts**:
+- Netlify (configured)
+- Vercel
+- GitHub Pages
+- Firebase Hosting
+
+## Actual Implementation vs. Original Plan
+
+### What's Different
+
+1. **File Organization**: Games are flatter (no nested `/store` and `/utils` directories)
+2. **Router**: TanStack Router uses dedicated `routes/` directory
+3. **Learning Algorithms**: Embedded in game `utils.ts` instead of separate `/lib/learning`
+4. **Game Registry**: Simple game exports instead of complex registry pattern (may evolve)
+5. **Design System**: Tailwind CSS v4 with neo-brutalist patterns (3px borders, hard shadows)
+
+### What Stayed the Same
+
+1. **Core Tech Stack**: React 18, TypeScript, Vite, Zustand, Dexie, TanStack Router
+2. **Offline-First**: IndexedDB for persistence, PWA configuration
+3. **Modular Games**: Self-contained game modules
+4. **Adaptive Learning**: Weighted selection based on error rates
+5. **Mobile-First**: Touch-optimized, 44px+ touch targets
+
 ## Change Log
 
-### Initial Architecture (2025-01-XX)
+### Version 0.1.0 - Initial Implementation (2025-10-18)
+- ✅ Implemented Letter Match game with full functionality
+- ✅ Set up IndexedDB with Dexie (letterMatchStatistics table)
+- ✅ Created Zustand store for game state
+- ✅ Built adaptive learning algorithm with weighted selection
+- ✅ Implemented neo-brutalist design system
+- ✅ Added shared component library (Button, Card, GameContainer, ScoreDisplay)
+- ✅ Configured Netlify deployment
+- ✅ Set up TanStack Router with file-based routing
+- ✅ Added component IDs for debugging
+- ✅ Cleaned up HomePage UI
+
+### Version 0.0.1 - Planning & Architecture (2025-01-17)
 - Defined core technology stack
 - Established modular game architecture
 - Planned offline-first PWA approach
@@ -430,6 +554,6 @@ export const ExampleGame: React.FC = () => {
 
 ---
 
-**Last Updated**: 2025-01-17
-**Version**: 1.0.0
+**Last Updated**: 2025-10-22
+**Version**: 0.1.0
 **Maintainer**: Project Team

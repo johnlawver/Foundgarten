@@ -13,3 +13,6 @@ export type { GameContainerProps } from './GameContainer';
 
 export { ScoreDisplay } from './ScoreDisplay';
 export type { ScoreDisplayProps } from './ScoreDisplay';
+
+export { ProfileSelector } from './ProfileSelector';
+export { ProfileCreateModal } from './ProfileCreateModal';

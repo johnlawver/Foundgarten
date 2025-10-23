@@ -19,6 +19,17 @@ export interface AppSettings {
 }
 
 /**
+ * Child profile interface
+ */
+export interface Profile {
+  id?: number;
+  name: string;
+  emoji: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
  * Main database class
  */
 export class FoundgartenDatabase extends Dexie {
@@ -26,6 +37,7 @@ export class FoundgartenDatabase extends Dexie {
   letterMatchStatistics!: Table<LetterMatchStatistics, number>;
   orientationGameStatistics!: Table<OrientationGameStatistics, number>;
   appSettings!: Table<AppSettings, number>;
+  profiles!: Table<Profile, number>;
 
   constructor() {
     super('FoundgartenDB');
@@ -44,6 +56,31 @@ export class FoundgartenDatabase extends Dexie {
       orientationGameStatistics: '++id, gameId, character, characterType, caseType, [character+characterType+caseType], lastAttempt',
       appSettings: '++id, &key',
     });
+
+    // Version 3: Add profiles and profileId to statistics
+    this.version(3).stores({
+      letterMatchStatistics: '++id, gameId, profileId, letter, caseType, [letter+caseType], [profileId+letter+caseType], lastAttempt',
+      orientationGameStatistics: '++id, gameId, profileId, character, characterType, caseType, [character+characterType+caseType], [profileId+character+characterType+caseType], lastAttempt',
+      appSettings: '++id, &key',
+      profiles: '++id, name, createdAt',
+    }).upgrade(async () => {
+      // Migration: Add profileId to existing statistics
+      // Note: User chose "start fresh" so we don't need to migrate old data
+      // We'll just ensure new records have profileId
+      console.log('Database upgraded to version 3 - profiles feature added');
+    });
+
+    // Version 4: Remove old compound indexes that don't include profileId
+    this.version(4).stores({
+      letterMatchStatistics: '++id, gameId, profileId, letter, caseType, [profileId+letter+caseType], lastAttempt',
+      orientationGameStatistics: '++id, gameId, profileId, character, characterType, caseType, [profileId+character+characterType+caseType], lastAttempt',
+      appSettings: '++id, &key',
+      profiles: '++id, name, createdAt',
+    }).upgrade(async () => {
+      // Cleanup: Removed old compound indexes [letter+caseType] and [character+characterType+caseType]
+      // All queries now properly scoped to profileId
+      console.log('Database upgraded to version 4 - cleaned up compound indexes');
+    });
   }
 
   /**
@@ -57,135 +94,26 @@ export class FoundgartenDatabase extends Dexie {
       // First run - initialize with defaults
       await this.appSettings.bulkAdd([
         { key: 'app.initialized', value: new Date().toISOString() },
-        { key: 'app.version', value: '0.1.0' },
+        { key: 'app.version', value: '0.2.0' }, // Updated version for profiles
       ]);
     }
 
-    // Initialize letter match statistics if empty
-    const letterStatsCount = await this.letterMatchStatistics.count();
-    if (letterStatsCount === 0) {
-      await this.initializeLetterMatchStats();
-    }
-
-    // Initialize orientation game statistics if empty
-    const orientationStatsCount = await this.orientationGameStatistics.count();
-    if (orientationStatsCount === 0) {
-      await this.initializeOrientationGameStats();
-    }
+    // Note: Statistics are now initialized per-profile by game utilities
+    // when a new profile is created or a game starts
   }
 
   /**
-   * Initialize Letter Match statistics for all letters
+   * Clear all game statistics for a specific profile (for reset functionality)
    */
-  async initializeLetterMatchStats(): Promise<void> {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const initialStats: Omit<LetterMatchStatistics, 'id'>[] = [];
-
-    for (const letter of alphabet) {
-      // Uppercase
-      initialStats.push({
-        gameId: 'letter-match',
-        itemId: `${letter}-uppercase`,
-        letter,
-        caseType: 'uppercase',
-        totalAttempts: 0,
-        correctCount: 0,
-        incorrectCount: 0,
-        lastAttempt: new Date(),
-        successRate: 0,
-      });
-
-      // Lowercase
-      initialStats.push({
-        gameId: 'letter-match',
-        itemId: `${letter.toLowerCase()}-lowercase`,
-        letter: letter.toLowerCase(),
-        caseType: 'lowercase',
-        totalAttempts: 0,
-        correctCount: 0,
-        incorrectCount: 0,
-        lastAttempt: new Date(),
-        successRate: 0,
-      });
-    }
-
-    await this.letterMatchStatistics.bulkAdd(initialStats);
-  }
-
-  /**
-   * Initialize Orientation Game statistics for common characters
-   */
-  async initializeOrientationGameStats(): Promise<void> {
-    const letters = {
-      uppercase: 'ABCDEFGHJKLMNPQRSTUVWXYZ',
-      lowercase: 'abcdefghjklmnpqrstuvwxyz',
-    };
-    const numbers = '0123456789';
-
-    const initialStats: Omit<OrientationGameStatistics, 'id'>[] = [];
-
-    // Uppercase letters
-    for (const char of letters.uppercase) {
-      initialStats.push({
-        gameId: 'orientation-game',
-        itemId: `${char}-uppercase`,
-        character: char,
-        characterType: 'letter',
-        caseType: 'uppercase',
-        totalAttempts: 0,
-        correctCount: 0,
-        incorrectCount: 0,
-        lastAttempt: new Date(),
-        successRate: 0,
-        confusionScore: 0,
-      });
-    }
-
-    // Lowercase letters
-    for (const char of letters.lowercase) {
-      initialStats.push({
-        gameId: 'orientation-game',
-        itemId: `${char}-lowercase`,
-        character: char,
-        characterType: 'letter',
-        caseType: 'lowercase',
-        totalAttempts: 0,
-        correctCount: 0,
-        incorrectCount: 0,
-        lastAttempt: new Date(),
-        successRate: 0,
-        confusionScore: 0,
-      });
-    }
-
-    // Numbers
-    for (const char of numbers) {
-      initialStats.push({
-        gameId: 'orientation-game',
-        itemId: `${char}-number`,
-        character: char,
-        characterType: 'number',
-        caseType: 'n/a',
-        totalAttempts: 0,
-        correctCount: 0,
-        incorrectCount: 0,
-        lastAttempt: new Date(),
-        successRate: 0,
-        confusionScore: 0,
-      });
-    }
-
-    await this.orientationGameStatistics.bulkAdd(initialStats);
-  }
-
-  /**
-   * Clear all game statistics (for reset functionality)
-   */
-  async clearAllStatistics(): Promise<void> {
-    await this.letterMatchStatistics.clear();
-    await this.orientationGameStatistics.clear();
-    await this.initializeLetterMatchStats();
-    await this.initializeOrientationGameStats();
+  async clearProfileStatistics(profileId: number): Promise<void> {
+    await this.letterMatchStatistics
+      .where('profileId')
+      .equals(profileId)
+      .delete();
+    await this.orientationGameStatistics
+      .where('profileId')
+      .equals(profileId)
+      .delete();
   }
 
   /**

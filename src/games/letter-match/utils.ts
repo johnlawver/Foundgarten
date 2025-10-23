@@ -44,10 +44,14 @@ export function generateFirstRound(config: LetterMatchConfig): Letter[] {
  * Uses weighted selection to prioritize struggling letters
  */
 export async function generateAdaptiveRound(
-  config: LetterMatchConfig
+  config: LetterMatchConfig,
+  profileId: number
 ): Promise<Letter[]> {
-  // Fetch all statistics
-  const allStats = await db.letterMatchStatistics.toArray();
+  // Fetch statistics for this profile only
+  const allStats = await db.letterMatchStatistics
+    .where('profileId')
+    .equals(profileId)
+    .toArray();
 
   // Calculate weights for each letter
   const weightedLetters: Array<Letter & { weight: number }> = [];
@@ -144,20 +148,22 @@ function calculateWeight(
  */
 export async function recordAnswer(
   letter: Letter,
-  correct: boolean
+  correct: boolean,
+  profileId: number
 ): Promise<void> {
   const upperLetter = letter.character.toUpperCase();
 
-  // Find existing stat
+  // Find existing stat for this profile
   let stat = await db.letterMatchStatistics
-    .where('[letter+caseType]')
-    .equals([upperLetter, letter.caseType])
+    .where('[profileId+letter+caseType]')
+    .equals([profileId, upperLetter, letter.caseType])
     .first();
 
   if (!stat) {
     // Create new stat entry
     stat = {
       gameId: 'letter-match',
+      profileId,
       itemId: `${upperLetter}-${letter.caseType}`,
       letter: upperLetter,
       caseType: letter.caseType as any, // Type assertion for 'both' | 'n/a' compatibility
@@ -186,12 +192,16 @@ export async function recordAnswer(
 }
 
 /**
- * Initialize default statistics for all letters
+ * Initialize default statistics for all letters for a specific profile
  */
-export async function initializeLetterStatistics(): Promise<void> {
-  const existingStats = await db.letterMatchStatistics.count();
+export async function initializeLetterStatistics(profileId: number): Promise<void> {
+  // Check if stats already exist for this profile
+  const existingStats = await db.letterMatchStatistics
+    .where('profileId')
+    .equals(profileId)
+    .count();
 
-  // Only initialize if no stats exist
+  // Only initialize if no stats exist for this profile
   if (existingStats > 0) return;
 
   const stats: LetterMatchStatistics[] = [];
@@ -200,6 +210,7 @@ export async function initializeLetterStatistics(): Promise<void> {
     for (const caseType of ['uppercase', 'lowercase'] as const) {
       stats.push({
         gameId: 'letter-match',
+        profileId,
         itemId: `${letter}-${caseType}`,
         letter,
         caseType: caseType as any, // Type assertion for CaseType compatibility
@@ -216,11 +227,14 @@ export async function initializeLetterStatistics(): Promise<void> {
 }
 
 /**
- * Reset all letter statistics
+ * Reset all letter statistics for a specific profile
  */
-export async function resetAllStatistics(): Promise<void> {
-  await db.letterMatchStatistics.clear();
-  await initializeLetterStatistics();
+export async function resetAllStatistics(profileId: number): Promise<void> {
+  await db.letterMatchStatistics
+    .where('profileId')
+    .equals(profileId)
+    .delete();
+  await initializeLetterStatistics(profileId);
 }
 
 /**

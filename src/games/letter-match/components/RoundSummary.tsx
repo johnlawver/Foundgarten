@@ -15,6 +15,7 @@ interface RoundSummaryProps {
   onPlayAgain: () => void;
   onHome: () => void;
   onSettings: () => void;
+  onViewProgress: () => void;
 }
 
 export function RoundSummary({
@@ -25,6 +26,7 @@ export function RoundSummary({
   onPlayAgain,
   onHome,
   onSettings,
+  onViewProgress,
 }: RoundSummaryProps) {
   const successRate =
     totalAttempts > 0
@@ -115,6 +117,15 @@ export function RoundSummary({
             id="letter-match-play-again-button"
           >
             🎮 Play Again
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={onViewProgress}
+            className="w-full !bg-teal-200 hover:!bg-teal-300 !shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            id="letter-match-view-progress-button"
+          >
+            📊 View Letter Progress
           </Button>
 
           <Button

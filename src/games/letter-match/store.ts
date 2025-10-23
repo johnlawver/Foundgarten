@@ -17,6 +17,7 @@ import {
   recordAnswer as recordAnswerToDB,
   initializeLetterStatistics,
 } from './utils';
+import { useProfileStore } from '@/lib/profiles/store';
 
 export const useLetterMatchStore = create<LetterMatchState>()(
   persist(
@@ -37,8 +38,15 @@ export const useLetterMatchStore = create<LetterMatchState>()(
         const { currentRound, config } = get();
         const nextRound = currentRound + 1;
 
-        // Ensure statistics are initialized
-        await initializeLetterStatistics();
+        // Get active profile
+        const activeProfileId = useProfileStore.getState().activeProfileId;
+        if (!activeProfileId) {
+          console.error('No active profile - cannot start round');
+          return;
+        }
+
+        // Ensure statistics are initialized for this profile
+        await initializeLetterStatistics(activeProfileId);
 
         let letters: Letter[];
 
@@ -47,7 +55,7 @@ export const useLetterMatchStore = create<LetterMatchState>()(
           letters = generateFirstRound(config);
         } else {
           // Adaptive rounds based on statistics
-          letters = await generateAdaptiveRound(config);
+          letters = await generateAdaptiveRound(config, activeProfileId);
         }
 
         set({
@@ -69,10 +77,17 @@ export const useLetterMatchStore = create<LetterMatchState>()(
           return; // Round already complete
         }
 
+        // Get active profile
+        const activeProfileId = useProfileStore.getState().activeProfileId;
+        if (!activeProfileId) {
+          console.error('No active profile - cannot record answer');
+          return;
+        }
+
         const currentLetter = sessionLetters[currentIndex];
 
         // Record to database
-        await recordAnswerToDB(currentLetter, correct);
+        await recordAnswerToDB(currentLetter, correct, activeProfileId);
 
         // Update score
         const newScore = correct ? currentScore + 1 : currentScore;
